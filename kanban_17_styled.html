@@ -8,20 +8,81 @@
     body { font-family: sans-serif; background: #eef2f5; padding: 20px; line-height: 1.4; }
     h2 { margin-bottom: 16px; color: #333; }
     .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-    .controls input, .controls select, .controls button { padding: 6px 10px; border: 1px solid #bbb; border-radius: 4px; background: #fff; }
-    .controls button { background: #4078c0; color: #fff; border-color: #305a8c; cursor: pointer; }
+    .controls input, .controls select, .controls button {
+      padding: 6px 10px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .controls button { 
+      background: #4078c0; 
+      color: #fff; 
+      border-color: #305a8c; 
+      cursor: pointer; 
+    }
     .controls button:hover { background: #305a8c; }
     .clear-btn { background: #c0392b; border-color: #922b21; }
     .clear-btn:hover { background: #922b21; }
-    .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-    .cell { background: #fff; border: 1px solid #dde2e8; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
-    .cell-header { background: #4078c0; color: #fff; text-align: center; padding: 8px; font-weight: bold; font-size: 14px; }
-    .cell-body { flex: 1; padding: 8px; overflow-y: auto; }
-    .cell-footer { background: #f5f7fa; color: #555; text-align: center; padding: 6px; font-size: 13px; border-top: 1px solid #dde2e8; }
-    .card { background: #ffeeba; border-left: 6px solid #d39e00; border-radius: 4px; padding: 8px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: move; transition: transform .1s; font-size: 13px; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .cell {
+      background: #fff;
+      border: 1px solid #dde2e8;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .cell-header {
+      background: #4078c0;
+      color: #fff;
+      text-align: center;
+      padding: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .cell-body {
+      flex: 1;
+      padding: 8px;
+      overflow-y: auto;
+    }
+    .cell-footer {
+      background: #f5f7fa;
+      color: #555;
+      text-align: center;
+      padding: 6px;
+      font-size: 13px;
+      border-top: 1px solid #dde2e8;
+    }
+    .card {
+      background: #ffeeba;
+      border-left: 6px solid #d39e00;
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      cursor: move;
+      transition: transform .1s;
+      font-size: 13px;
+    }
     .card:hover { transform: translateY(-2px); }
-    .green { background: #d4edda; border-left-color: #28a745 !important; }
-    .status-btn, .delete-btn { margin-top: 6px; background: transparent; border: none; color: #555; cursor: pointer; font-size: 12px; padding: 2px 4px; }
+    .green {
+      background: #d4edda !important;
+      border-left-color: #28a745 !important;
+    }
+    .status-btn, .delete-btn {
+      margin-top: 6px;
+      background: transparent;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 4px;
+    }
     .delete-btn { color: #c0392b; }
   </style>
 </head>
@@ -41,8 +102,8 @@
     <option value="Лично">Лично</option>
     <option value="Онлайн">Онлайн</option>
   </select>
-  <label><input id="hookah" type="checkbox">Кальян</label>
-  <label><input id="vr" type="checkbox">VR</label>
+  <label><input id="hookah" type="checkbox"> Кальян</label>
+  <label><input id="vr" type="checkbox"> VR</label>
   <button onclick="addCard()">Добавить</button>
   <button class="clear-btn" onclick="clearAll()">Очистить все</button>
 </div>
@@ -50,17 +111,16 @@
 <div class="board" id="board"></div>
 
 <script>
-  // Генерация опций выбора столов и самих столов
+  // Сгенерировать список столов и селект
   const tableSelect = document.getElementById('table');
   const board = document.getElementById('board');
-
   for (let i = 1; i <= 17; i++) {
-    // Опция
-    let opt = document.createElement('option');
+    // опция в селекте
+    const opt = document.createElement('option');
     opt.value = i; opt.textContent = i;
     tableSelect.appendChild(opt);
 
-    // Вместимость
+    // определить вместимость
     let cap;
     if (i <= 8) cap = '4–6 чел.';
     else if ([9,12,16].includes(i)) cap = '4 чел.';
@@ -68,9 +128,10 @@
     else if ([10,11,15].includes(i)) cap = '8 чел.';
     else cap = 'VIP 12+ чел.';
 
-    // Столик
+    // создать ячейку стола
     const cell = document.createElement('div');
-    cell.className = 'cell'; cell.id = 'table-'+i;
+    cell.className = 'cell';
+    cell.id = 'table-' + i;
     cell.ondragover = ev => ev.preventDefault();
     cell.ondrop = ev => drop(ev);
     cell.innerHTML = `
@@ -82,11 +143,14 @@
   }
 
   let cardId = 0;
-  function drag(ev) { ev.dataTransfer.setData('text', ev.target.id); }
+  function drag(ev) {
+    ev.dataTransfer.setData('text', ev.target.id);
+  }
   function drop(ev) {
     ev.preventDefault();
     const id = ev.dataTransfer.getData('text');
-    ev.currentTarget.querySelector('.cell-body').appendChild(document.getElementById(id));
+    const target = ev.currentTarget.querySelector('.cell-body');
+    target.appendChild(document.getElementById(id));
     saveState();
   }
 
@@ -99,12 +163,12 @@
     const source = document.getElementById('source').value;
     const hookah = document.getElementById('hookah').checked ? 'Кальян' : '';
     const vr     = document.getElementById('vr').checked     ? 'VR'     : '';
-    if (!name||!phone||!table||!time||!guests||!source) return;
+    if (!name || !phone || !table || !time || !guests || !source) return;
 
     const card = document.createElement('div');
-    card.className = 'card red'; 
-    card.id = 'card-'+cardId++;
-    card.draggable = true; 
+    card.className = 'card red';
+    card.id = 'card-' + cardId++;
+    card.draggable = true;
     card.ondragstart = drag;
     card.innerHTML = `
       <strong>${name}</strong><br>
@@ -114,7 +178,7 @@
       <button class="status-btn" onclick="toggleStatus('${card.id}')">Статус</button>
       <button class="delete-btn" onclick="deleteCard('${card.id}')">Удалить</button>
     `;
-    document.querySelector('#table-'+table+' .cell-body').appendChild(card);
+    document.querySelector('#table-' + table + ' .cell-body').appendChild(card);
     saveState();
   }
 
@@ -127,13 +191,13 @@
   function deleteCard(id) {
     const card = document.getElementById(id);
     if (card) card.remove();
-    let data = JSON.parse(localStorage.getItem('kanban17')||'[]');
+    let data = JSON.parse(localStorage.getItem('kanban17') || '[]');
     data = data.filter(item => item.id !== id);
     localStorage.setItem('kanban17', JSON.stringify(data));
   }
 
   function clearAll() {
-    document.querySelectorAll('.card').forEach(c=>c.remove());
+    document.querySelectorAll('.card').forEach(c => c.remove());
     localStorage.removeItem('kanban17');
   }
 
@@ -151,10 +215,13 @@
   function loadState() {
     const data = JSON.parse(localStorage.getItem('kanban17') || '[]');
     data.forEach(item => {
-      const cell = document.querySelector('#table-'+item.table+' .cell-body');
+      const cell = document.querySelector('#table-' + item.table + ' .cell-body');
       if (!cell) return;
       const c = document.createElement('div');
-      c.id = item.id; c.className = item.cls; c.draggable = true; c.ondragstart = drag;
+      c.id = item.id;
+      c.className = item.cls;
+      c.draggable = true;
+      c.ondragstart = drag;
       c.innerHTML = item.html;
       cell.appendChild(c);
     });
