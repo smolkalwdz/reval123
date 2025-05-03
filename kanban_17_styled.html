@@ -5,21 +5,91 @@
   <title>Канбан-доска броней (17 столов)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: sans-serif; background: #eef2f5; padding: 20px; line-height: 1.4; }
+    body {
+      font-family: sans-serif;
+      background: #eef2f5;
+      padding: 20px;
+      line-height: 1.4;
+    }
     h2 { margin-bottom: 16px; color: #333; }
-    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-    .controls input, .controls select, .controls button { padding: 6px 10px; border: 1px solid #bbb; border-radius: 4px; background: #fff; }
-    .controls button { background: #4078c0; color: #fff; border-color: #305a8c; cursor: pointer; }
-    .controls button:hover { background: #305a8c; }
-    .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-    .cell { background: #fff; border: 1px solid #dde2e8; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
-    .cell-header { background: #4078c0; color: #fff; text-align: center; padding: 8px; font-weight: bold; font-size: 14px; }
-    .cell-body { flex: 1; padding: 8px; overflow-y: auto; }
-    .cell-footer { background: #f5f7fa; color: #555; text-align: center; padding: 6px; font-size: 13px; border-top: 1px solid #dde2e8; }
-    .card { background: #ffeeba; border-left: 6px solid #d39e00; border-radius: 4px; padding: 8px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: move; transition: transform .1s; font-size: 13px; }
-    .card:hover { transform: translateY(-2px); }
-    .green { background: #d4edda; border-left-color: #28a745 !important; }
-    .status-btn { margin-top: 6px; background: transparent; border: none; color: #555; cursor: pointer; font-size: 12px; }
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 20px;
+    }
+    .controls input, .controls select, .controls button {
+      padding: 6px 10px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .controls button {
+      background: #4078c0; color: #fff;
+      border-color: #305a8c;
+      cursor: pointer;
+    }
+    .controls button:hover {
+      background: #305a8c;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .cell {
+      background: #fff;
+      border: 1px solid #dde2e8;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .cell-header {
+      background: #4078c0;
+      color: #fff;
+      text-align: center;
+      padding: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .cell-body {
+      flex: 1;
+      padding: 8px;
+      overflow-y: auto;
+    }
+    .cell-footer {
+      background: #f5f7fa;
+      color: #555;
+      text-align: center;
+      padding: 6px;
+      font-size: 13px;
+      border-top: 1px solid #dde2e8;
+    }
+    .card {
+      background: #ffeeba;
+      border-left: 6px solid #d39e00;
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      cursor: move;
+      transition: transform .1s;
+      font-size: 13px;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+    }
+    .card.green {
+      background: #d4edda;
+      border-left-color: #28a745;
+    }
+    .status-btn {
+      margin-top: 6px;
+      background: transparent;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -31,23 +101,8 @@
   <input id="phone" placeholder="Телефон">
   <select id="table">
     <option disabled selected>Стол</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-    <option value="11">11</option>
-    <option value="12">12</option>
-    <option value="13">13</option>
-    <option value="14">14</option>
-    <option value="15">15</option>
-    <option value="16">16</option>
-    <option value="17">17</option>
+    <!-- 1–17 -->
+    ${[...Array(17)].map((_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
   </select>
   <input id="time" type="time">
   <input id="guests" type="number" placeholder="Гостей">
@@ -63,104 +118,34 @@
 </div>
 
 <div class="board" id="board">
-<div class="cell" id="table-1" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 1</div>
+  <!-- генерируем 17 столов -->
+  ${[...Array(17)].map((_,i)=>{
+    const n = i+1;
+    let cap = '';
+    if(n<=8) cap='4–6 чел.';
+    else if([9,12,16].includes(n)) cap='4 чел.';
+    else if([13,14].includes(n)) cap='2 чел.';
+    else if([10,11,15].includes(n)) cap='8 чел.';
+    else cap='VIP 12+ чел.';
+    return `
+    <div class="cell" id="table-${n}" ondragover="allowDrop(event)" ondrop="drop(event)">
+      <div class="cell-header">Стол ${n}</div>
       <div class="cell-body"></div>
-      <div class="cell-footer">4–6 чел.</div>
-    </div>
-    <div class="cell" id="table-2" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 2</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4–6 чел.</div>
-    </div>
-    <div class="cell" id="table-3" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 3</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4–6 чел.</div>
-    </div>
-    <div class="cell" id="table-4" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 4</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4–6 чел.</div>
-    </div>
-    <div class="cell" id="table-5" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 5</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4–6 чел.</div>
-    </div>
-    <div class="cell" id="table-6" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 6</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4–6 чел.</div>
-    </div>
-    <div class="cell" id="table-7" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 7</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4–6 чел.</div>
-    </div>
-    <div class="cell" id="table-8" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 8</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4–6 чел.</div>
-    </div>
-    <div class="cell" id="table-9" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 9</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4 чел.</div>
-    </div>
-    <div class="cell" id="table-10" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 10</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">8 чел.</div>
-    </div>
-    <div class="cell" id="table-11" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 11</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">8 чел.</div>
-    </div>
-    <div class="cell" id="table-12" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 12</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4 чел.</div>
-    </div>
-    <div class="cell" id="table-13" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 13</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">2 чел.</div>
-    </div>
-    <div class="cell" id="table-14" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 14</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">2 чел.</div>
-    </div>
-    <div class="cell" id="table-15" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 15</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">8 чел.</div>
-    </div>
-    <div class="cell" id="table-16" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 16</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">4 чел.</div>
-    </div>
-    <div class="cell" id="table-17" ondragover="allowDrop(event)" ondrop="drop(event)">
-      <div class="cell-header">Стол 17</div>
-      <div class="cell-body"></div>
-      <div class="cell-footer">VIP 12+ чел.</div>
-    </div>
+      <div class="cell-footer">${cap}</div>
+    </div>`;
+  }).join('')}
 </div>
 
 <script>
   let cardId = 0;
-  function allowDrop(ev) { ev.preventDefault(); }
-  function drag(ev) { ev.dataTransfer.setData('text', ev.target.id); }
-  function drop(ev) {
-    ev.preventDefault();
+  function allowDrop(ev){ ev.preventDefault(); }
+  function drag(ev){ ev.dataTransfer.setData('text', ev.target.id); }
+  function drop(ev){ ev.preventDefault(); 
     const id = ev.dataTransfer.getData('text');
     ev.currentTarget.querySelector('.cell-body').appendChild(document.getElementById(id));
     saveState();
   }
-  function addCard() {
+  function addCard(){
     const name = document.getElementById('name').value.trim();
     const phone = document.getElementById('phone').value.trim();
     const table = document.getElementById('table').value;
@@ -173,7 +158,7 @@
 
     const card = document.createElement('div');
     card.className = 'card red';
-    card.id = 'card-' + cardId++;
+    card.id = 'card-'+cardId++;
     card.draggable = true;
     card.ondragstart = drag;
     card.innerHTML = `
@@ -186,37 +171,34 @@
     document.querySelector('#table-'+table+' .cell-body').appendChild(card);
     saveState();
   }
-  function toggleStatus(id) {
+  function toggleStatus(id){
     const c = document.getElementById(id);
     c.classList.toggle('green');
+    c.classList.toggle('red');
     saveState();
   }
-  function saveState() {
-    const data = [];
-    document.querySelectorAll('.cell').forEach(cell => {
+  function saveState(){
+    const data=[];
+    document.querySelectorAll('.cell').forEach(cell=>{
       const t = cell.id.split('-')[1];
-      cell.querySelectorAll('.card').forEach(c => {
-        data.push({ id: c.id, table: t, cls: c.className, html: c.innerHTML });
+      cell.querySelectorAll('.card').forEach(c=>{
+        data.push({
+          id:c.id, table:t, cls:c.className, html:c.innerHTML
+        });
       });
     });
     localStorage.setItem('kanban17', JSON.stringify(data));
   }
-  function loadState() {
-    const data = JSON.parse(localStorage.getItem('kanban17') || '[]');
-    data.forEach(item => {
+  function loadState(){
+    const data=JSON.parse(localStorage.getItem('kanban17')||'[]');
+    data.forEach(item=>{
       const cell = document.querySelector('#table-'+item.table+' .cell-body');
       if(!cell) return;
       const c = document.createElement('div');
-      c.id = item.id;
-      c.className = item.cls;
-      c.draggable = true;
-      c.ondragstart = drag;
-      c.innerHTML = item.html;
+      c.id=item.id; c.className=item.cls; c.draggable=true; c.ondragstart=drag;
+      c.innerHTML=item.html;
       cell.appendChild(c);
     });
   }
   window.onload = loadState;
 </script>
-
-</body>
-</html>
